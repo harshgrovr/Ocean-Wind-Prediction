@@ -9,9 +9,9 @@ config = {
 "seq_dim" : 32,
 "batch_size" :256,
 "num_workers":4,
-"mlp": True,
+"mlp": False,
 "cnn": False,
-"CNNLSTM": False,
+"CNNLSTM": True,
 "pre_train_cnn": False,
 "randomSampler": False,
 "scheduler": False
