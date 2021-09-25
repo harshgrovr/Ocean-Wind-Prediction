@@ -12,14 +12,15 @@ from config import config
 class WindDataset(Dataset):
     def __init__(self, labelDataIndexes, dataset, transform = None):
         super(WindDataset, self).__init__()
-        self.input =  labelDataIndexes           
+        self.input_ =  labelDataIndexes           
         self.imageData, self.windData = dataset
-        self.transform = transform        
+        self.transform = transform   
 
-    def __getitem__(self, idx):                 
-        index = idx
+    def __getitem__(self, idx):
+        # Changed
+        index = self.input_[idx]
         self.label = self.windData[index]
-        self.image  = self.imageData[index]        
+        self.image  = self.imageData[index]
         
         if self.transform:            
           self.image = self.transform(self.image)                                   
@@ -29,19 +30,21 @@ class WindDataset(Dataset):
         return self.image, self.label
 
     def __len__(self):
-        return len(self.input)
+        return len(self.input_)
     
 # Dataset Class for CNN-LSTM
 class WindDatasetSequence(Dataset):
     def __init__(self, labelDataIndexes, dataset, transform = None):
         super(WindDatasetSequence, self).__init__()
-        self.input =  labelDataIndexes           
+        self.input_ =  labelDataIndexes           
         self.imageSeq, self.windData = dataset        
         self.layer_dim = config['layer_dim']
         self.hidden_dim = config['hidden_dim']
         self.transform = transform        
 
-    def __getitem__(self, idx):        
+    def __getitem__(self, idx):      
+        # Changed
+        idx = self.input_[idx]
         self.label = self.windData[idx + config['seq_dim']]
         
         # if self.transform:            
@@ -53,4 +56,5 @@ class WindDatasetSequence(Dataset):
         return self.images, self.label
 
     def __len__(self):
-        return len(self.input - config['seq_dim'] - 1)
+      # Changed
+        return len(self.input_) - config['seq_dim']

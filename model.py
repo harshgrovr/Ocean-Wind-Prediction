@@ -8,14 +8,14 @@ from config import config
 class MLP(nn.Module):
     def __init__(self):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(11 * 17, 256)
-        self.fc2 = nn.Linear(256, 64)
-        self.fc3 = nn.Linear(64, 1)
-        self.dropout = nn.Dropout(0.4)
+        self.fc1 = nn.Linear(11 * 17, 128)
+        self.fc2 = nn.Linear(128, 16)
+        self.fc3 = nn.Linear(16, 1)
+        self.dropout = nn.Dropout(0.5)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))        
-        x = F.relu(self.fc2(x))        
+        x = self.dropout(F.relu(self.fc1(x)))
+        x = self.dropout(F.relu(self.fc2(x)))
         x = self.fc3(x)
         return x
 
@@ -30,7 +30,7 @@ class CNN(nn.Module):
         self.Linear1 = nn.Linear(256, 32)
         self.Linear2 = nn.Linear(32, num_classes)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.1)
 
     def forward(self, images):
         features = self.resnet50(images)
@@ -46,14 +46,15 @@ class SimpleCNN(nn.Module):
         self.conv1 = nn.Conv2d(1, 8, kernel_size=3,stride=1,padding=1)
         self.conv2 = nn.Conv2d(8, 16,kernel_size=3,stride=1, padding=1)        
         self.conv3 = nn.Conv2d(16, 32,kernel_size=3,stride=1, padding=1)           
-        # 2*2 Pooling layer     
-        self.pool = nn.MaxPool2d(2, 2)        
+        # 2*2 Pooling layer
+        self.pool = nn.MaxPool2d(2, 2)      
         # batch norm layers
         self.batchnorm1 = nn.BatchNorm2d(8)
         self.batchnorm2 = nn.BatchNorm2d(16)
         self.batchnorm3 = nn.BatchNorm2d(32) 
         
     def forward(self, x):
+        # change, can shuffle relu and batchnorm.
         x = self.pool(F.relu(self.batchnorm1(self.conv1(x))))
         x = F.relu(self.batchnorm2(self.conv2(x)))
         x = self.pool(F.relu(self.batchnorm3(self.conv3(x))))
@@ -63,8 +64,8 @@ class SimpleCNN(nn.Module):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()        
-        self.SimpleCNN = SimpleCNN()           
-        self.dropout = nn.Dropout(0.5)  
+        self.SimpleCNN = SimpleCNN()
+        self.dropout = nn.Dropout(0.3)  
         self.fc1 = nn.Linear(32 * 4 * 2, 64)
         self.fc2 = nn.Linear(64, 1)
         
@@ -95,7 +96,7 @@ class CNNLSTM(nn.Module):
         return hn, cn
 
     def __init__(self, num_classes=1):
-        super(CNNLSTM, self).__init__()        
+        super(CNNLSTM, self).__init__()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")        
         self.layer_dim = config['layer_dim']
         self.hidden_dim = config['hidden_dim']
